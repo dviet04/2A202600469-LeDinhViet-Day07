@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
+from typing import Callable
 
 from dotenv import load_dotenv
 
@@ -92,6 +93,11 @@ def mock_llm(prompt: str) -> str:
     return f"[MOCK LLM] Generated answer from prompt: {preview}..."
 
 
+def get_llm_function() -> Callable[[str], str]:
+    """Return openai_llm if OPENAI_API_KEY is set, otherwise mock_llm."""
+    return openai_llm if os.getenv("OPENAI_API_KEY") else mock_llm
+
+
 def run_manual_demo(
     question: str | None = None,
     sample_files: list[str] | None = None
@@ -153,7 +159,7 @@ def run_manual_demo(
 
     agent = KnowledgeBaseAgent(
         store=store,
-        llm_fn=openai_llm if os.getenv("OPENAI_API_KEY") else mock_llm,
+        llm_fn=get_llm_function(),
     )
 
     print(f"Question: {query}")
