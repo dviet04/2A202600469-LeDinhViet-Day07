@@ -11,29 +11,30 @@
 ### Cosine Similarity (Ex 1.1)
 
 **High cosine similarity nghĩa là gì?**
-> *Viết 1-2 câu:*
+> Hai vector (embedding) có hướng gần giống nhau, tức là nội dung/ngữ nghĩa của hai câu rất tương đồng.
 
 **Ví dụ HIGH similarity:**
-- Sentence A:
-- Sentence B:
-- Tại sao tương đồng:
+- Sentence A: "I love playing football."
+- Sentence B: "I enjoy playing soccer."
+- Tại sao tương đồng:Cùng nói về sở thích chơi bóng đá (football = soccer), khác từ nhưng cùng ý nghĩa.
 
 **Ví dụ LOW similarity:**
-- Sentence A:
-- Sentence B:
-- Tại sao khác:
+- Sentence A: "I love playing football."
+- Sentence B: "The sky is very blue today."
+- Tại sao khác:Hai câu nói về hai chủ đề hoàn toàn khác nhau (thể thao vs thời tiết).
 
 **Tại sao cosine similarity được ưu tiên hơn Euclidean distance cho text embeddings?**
-> *Viết 1-2 câu:*
+> Cosine similarity đo hướng (ngữ nghĩa) thay vì độ lớn vector, nên ít bị ảnh hưởng bởi độ dài câu và phản ánh ý nghĩa tốt hơn.
 
 ### Chunking Math (Ex 1.2)
 
 **Document 10,000 ký tự, chunk_size=500, overlap=50. Bao nhiêu chunks?**
-> *Trình bày phép tính:*
-> *Đáp án:*
+> Bước nhảy mỗi chunk = 500 − 50 = 450
+Số chunks = [(10000 − 50) / 450] = 9950 / 450 ≈ 22.11
+> *Đáp án:* 23 chunks
 
 **Nếu overlap tăng lên 100, chunk count thay đổi thế nào? Tại sao muốn overlap nhiều hơn?**
-> *Viết 1-2 câu:*
+> Số chunks tăng lên (vì bước nhảy nhỏ hơn), giúp giữ ngữ cảnh tốt hơn giữa các đoạn nhưng tốn tài nguyên hơn.
 
 ---
 
@@ -42,9 +43,10 @@
 ### Domain & Lý Do Chọn
 
 **Domain:** [ví dụ: Customer support FAQ, Vietnamese law, cooking recipes, ...]
+Tech docs
 
 **Tại sao nhóm chọn domain này?**
-> *Viết 2-3 câu:*
+> Question Answering based Clinical Text Structuring Using Pre-trained Language Model
 
 ### Data Inventory
 
@@ -104,8 +106,8 @@ Chạy `ChunkingStrategyComparator().compare()` trên 2-3 tài liệu:
 | Thành viên | Strategy | Retrieval Score (/10) | Điểm mạnh | Điểm yếu |
 |-----------|----------|----------------------|-----------|----------|
 | Tôi | | | | |
-| [Tên] | | | | |
-| [Tên] | | | | |
+| Trần Văn Tuấn | | | | |
+|  | | | | |
 
 **Strategy nào tốt nhất cho domain này? Tại sao?**
 > *Viết 2-3 câu:*
