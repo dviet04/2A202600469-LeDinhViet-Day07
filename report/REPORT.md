@@ -1,8 +1,8 @@
 # Báo Cáo Lab 7: Embedding & Vector Store
 
-**Họ tên:** [Tên sinh viên]
-**Nhóm:** [Tên nhóm]
-**Ngày:** [Ngày nộp]
+**Họ tên:** Lê Đình Việt
+**Nhóm:** C401-D4
+**Ngày:** 10/04/2026
 
 ---
 
