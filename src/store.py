@@ -136,7 +136,6 @@ class EmbeddingStore:
                 seen_ids.add(doc.id)
                 record = self._make_record(doc)
                 self._store.append(record)
-        # raise NotImplementedError("Implement EmbeddingStore.add_documents")
 
     def search(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
         """
@@ -165,7 +164,6 @@ class EmbeddingStore:
             ]
 
         return self._search_records(query, self._store, top_k)
-        # raise NotImplementedError("Implement EmbeddingStore.search")
 
     def get_collection_size(self) -> int:
         """Return the total number of stored chunks."""
@@ -173,7 +171,6 @@ class EmbeddingStore:
         if self._use_chroma:
             return self._collection.count()
         return len(self._store)
-        # raise NotImplementedError("Implement EmbeddingStore.get_collection_size")
 
     def search_with_filter(self, query: str, top_k: int = 3, metadata_filter: dict = None) -> list[dict]:
         """
@@ -211,7 +208,6 @@ class EmbeddingStore:
         ]
 
         return self._search_records(query, filtered, top_k)
-        # raise NotImplementedError("Implement EmbeddingStore.search_with_filter")
 
     def delete_document(self, id: str) -> bool:
         """
@@ -233,4 +229,3 @@ class EmbeddingStore:
         ]
 
         return len(self._store) < initial_len
-        # raise NotImplementedError("Implement EmbeddingStore.delete_document")
