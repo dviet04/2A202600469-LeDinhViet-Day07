@@ -8,6 +8,7 @@ from typing import Callable
 from dotenv import load_dotenv
 
 from src.agent import KnowledgeBaseAgent
+from src.chunking import SentenceChunker
 from src.embeddings import (
     EMBEDDING_PROVIDER_ENV,
     LOCAL_EMBEDDING_MODEL,
@@ -20,18 +21,14 @@ from src.models import Document
 from src.store import EmbeddingStore
 
 SAMPLE_FILES = [
-    # "data/python_intro.txt",
-    # "data/vector_store_notes.md",
-    # "data/rag_system_design.md",
-    # "data/customer_support_playbook.txt",
-    # "data/chunking_experiment_report.md",
-    # "data/vi_retrieval_notes.md",
-    "data/file1.txt",
-    "data/file2.txt",
-    "data/file3.txt",
-    "data/file4.txt",
-    "data/file5.txt",
-    "data/file6.txt",
+    "data/file1.md",
+    "data/file2.md",
+    "data/file3.md",
+    "data/file4.md",
+    "data/file5.md",
+    "data/file6.md",
+    "data/file7.md",
+    "data/file8.md",
 ]
 
 def openai_llm(prompt: str) -> str:
@@ -144,7 +141,20 @@ def run_manual_demo(
         embedding_fn=embedder,
     )
 
-    store.add_documents(docs)
+    chunker = SentenceChunker(max_sentences_per_chunk=3, overlap=1)
+    chunked_docs: list[Document] = []
+    for doc in docs:
+        chunks = chunker.chunk(doc.content)
+        for chunk_index, chunk_text in enumerate(chunks):
+            chunked_docs.append(
+                Document(
+                    id=f"{doc.id}_chunk{chunk_index}",
+                    content=chunk_text,
+                    metadata={**doc.metadata, "parent_doc": doc.id},
+                )
+            )
+
+    store.add_documents(chunked_docs)
 
     print(f"Stored {store.get_collection_size()} documents")
 

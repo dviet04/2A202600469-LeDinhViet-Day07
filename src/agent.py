@@ -41,17 +41,29 @@ class KnowledgeBaseAgent:
 
         context_chunks = []
         total_length = 0
+        seen_contents: set[str] = set()
 
         for i, r in enumerate(filtered):
             chunk = r["content"].strip()
 
-            if not chunk:
+            if not chunk or chunk in seen_contents:
                 continue
 
+            seen_contents.add(chunk)
             chunk_text = f"[Source {i+1}]\n{chunk}"
+            remaining = MAX_CONTEXT_CHARS - total_length
 
-            if total_length + len(chunk_text) > MAX_CONTEXT_CHARS:
+            if remaining <= 0:
                 break
+
+            if len(chunk_text) > remaining:
+                if not context_chunks:
+                    # Always include at least one chunk, truncated at word boundary
+                    truncated = chunk_text[:remaining]
+                    last_space = truncated.rfind(" ")
+                    chunk_text = truncated[:last_space] if last_space > 0 else truncated
+                else:
+                    break
 
             context_chunks.append(chunk_text)
             total_length += len(chunk_text)
