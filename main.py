@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from openai import OpenAI
 
 from src.agent import KnowledgeBaseAgent
 from src.embeddings import (
@@ -32,10 +31,14 @@ SAMPLE_FILES = [
     "data/file4.txt",
     "data/file5.txt",
     "data/file6.txt",
-    "data/file1.txt"
 ]
 
 def openai_llm(prompt: str) -> str:
+    try:
+        from openai import OpenAI
+    except ImportError:
+        return "[openai not installed — install with: pip install openai]"
+
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     response = client.chat.completions.create(
@@ -81,6 +84,12 @@ def load_documents_from_files(file_paths: list[str]) -> list[Document]:
 #     """A simple mock LLM for manual RAG testing."""
 #     preview = prompt[:400].replace("\n", " ")
 #     return f"[DEMO LLM] Generated answer from prompt preview: {preview}..."
+
+
+def mock_llm(prompt: str) -> str:
+    """Simple mock LLM for testing without an API key."""
+    preview = prompt[:400].replace("\n", " ")
+    return f"[MOCK LLM] Generated answer from prompt: {preview}..."
 
 
 def run_manual_demo(
@@ -144,7 +153,7 @@ def run_manual_demo(
 
     agent = KnowledgeBaseAgent(
         store=store,
-        llm_fn=openai_llm,  
+        llm_fn=openai_llm if os.getenv("OPENAI_API_KEY") else mock_llm,
     )
 
     print(f"Question: {query}")
