@@ -45,8 +45,9 @@ class SentenceChunker:
     Strip extra whitespace from each chunk.
     """
 
-    def __init__(self, max_sentences_per_chunk: int = 3) -> None:
+    def __init__(self, max_sentences_per_chunk: int = 3, overlap: int = 0) -> None:
         self.max_sentences_per_chunk = max(1, max_sentences_per_chunk)
+        self.overlap = max(0, min(overlap, max_sentences_per_chunk - 1))
 
     def chunk(self, text: str) -> list[str]:
         # TODO: split into sentences, group into chunks
@@ -62,11 +63,11 @@ class SentenceChunker:
 
         for i in range(0, len(sentences), step):
             group = sentences[i:i + self.max_sentences_per_chunk]
-            chunks.append(" ".join(group))
+            chunk = " ".join(group)
+            if chunk:
+                chunks.append(chunk)
 
         return chunks
-
-        raise NotImplementedError("Implement SentenceChunker.chunk")
 
 
 class RecursiveChunker:
@@ -89,7 +90,6 @@ class RecursiveChunker:
             return []
 
         return self._split(text.strip(), self.separators)
-        raise NotImplementedError("Implement RecursiveChunker.chunk")
 
     def _split(self, current_text: str, remaining_separators: list[str]) -> list[str]:
         # TODO: recursive helper used by RecursiveChunker.chunk
@@ -128,8 +128,6 @@ class RecursiveChunker:
             chunks.append(buffer.strip())
 
         return chunks
-                
-        raise NotImplementedError("Implement RecursiveChunker._split")
 
 
 def _dot(a: list[float], b: list[float]) -> float:
@@ -157,7 +155,6 @@ def compute_similarity(vec_a: list[float], vec_b: list[float]) -> float:
         return 0.0
 
     return _dot(vec_a, vec_b) / (norm_a * norm_b)
-    raise NotImplementedError("Implement compute_similarity")
 
 
 class ChunkingStrategyComparator:
@@ -168,9 +165,9 @@ class ChunkingStrategyComparator:
         # from chunking import SentenceChunker, RecursiveChunker, FixedSizeChunker
 
         strategies = {
-            "sentence": SentenceChunker(),
+            "by_sentences": SentenceChunker(),
             "recursive": RecursiveChunker(chunk_size=chunk_size),
-            "fixed": FixedSizeChunker(chunk_size=chunk_size),
+            "fixed_size": FixedSizeChunker(chunk_size=chunk_size),
         }
 
         return {
@@ -197,6 +194,5 @@ class ChunkingStrategyComparator:
             "max_length": max(lengths),
             "chunks": chunks 
         }
-        raise NotImplementedError("Implement ChunkingStrategyComparator.compare")
     
     
