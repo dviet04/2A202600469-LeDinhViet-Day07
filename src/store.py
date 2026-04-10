@@ -41,6 +41,8 @@ class EmbeddingStore:
         self._store: list[dict[str, Any]] = []
         self._collection = None
         self._next_index = 0
+        self._query_cache: dict[str, list[float]] = {}
+        self._query_cache_max = 256
 
         try:
             import chromadb  # noqa: F401
@@ -72,11 +74,19 @@ class EmbeddingStore:
 
         self._next_index += 1
         return record
-        raise NotImplementedError("Implement EmbeddingStore._make_record")
 
     def _search_records(self, query: str, records: list[dict[str, Any]], top_k: int) -> list[dict[str, Any]]:
         # TODO: run in-memory similarity search over provided records
-        query_vec = _normalize(self._embedding_fn(query))
+        if not records:
+            return []
+
+        if query in self._query_cache:
+            query_vec = self._query_cache[query]
+        else:
+            query_vec = _normalize(self._embedding_fn(query))
+            if len(self._query_cache) >= self._query_cache_max:
+                self._query_cache.pop(next(iter(self._query_cache)))
+            self._query_cache[query] = query_vec
 
         scored = []
         for r in records:
@@ -89,7 +99,6 @@ class EmbeddingStore:
 
         scored.sort(key=lambda x: x["score"], reverse=True)
         return scored[:top_k]
-        raise NotImplementedError("Implement EmbeddingStore._search_records")
 
     def add_documents(self, docs: list[Document]) -> None:
         """
@@ -103,6 +112,8 @@ class EmbeddingStore:
             ids, documents, embeddings, metadatas = [], [], [], []
 
             for doc in docs:
+                if not doc.content:
+                    continue
                 record = self._make_record(doc)
 
                 ids.append(record["id"])
@@ -110,14 +121,19 @@ class EmbeddingStore:
                 embeddings.append(record["embedding"])
                 metadatas.append(record["metadata"])
 
-            self._collection.add(
-                ids=ids,
-                documents=documents,
-                embeddings=embeddings,
-                metadatas=metadatas,
-            )
+            if ids:
+                self._collection.add(
+                    ids=ids,
+                    documents=documents,
+                    embeddings=embeddings,
+                    metadatas=metadatas,
+                )
         else:
+            seen_ids: set[str] = set()
             for doc in docs:
+                if not doc.content or doc.id in seen_ids:
+                    continue
+                seen_ids.add(doc.id)
                 record = self._make_record(doc)
                 self._store.append(record)
         # raise NotImplementedError("Implement EmbeddingStore.add_documents")

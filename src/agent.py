@@ -86,4 +86,3 @@ class KnowledgeBaseAgent:
             return "I don't know."
 
         return answer
-        raise NotImplementedError("Implement KnowledgeBaseAgent.answer")
