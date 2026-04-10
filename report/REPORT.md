@@ -218,14 +218,14 @@ tests/test_solution.py::TestEmbeddingStoreDeleteDocument::test_delete_returns_tr
 
 | Pair | Sentence A | Sentence B | Dự đoán | Actual Score | Đúng? |
 |------|-----------|-----------|---------|--------------|-------|
-| 1 | | | high / low | | |
-| 2 | | | high / low | | |
-| 3 | | | high / low | | |
-| 4 | | | high / low | | |
-| 5 | | | high / low | | |
+| 1 | I love playing football.|I enjoy playing soccer. | high | 0.9| Đúng |
+| 2 |The cat is sleeping on the sofa. |A dog is barking loudly outside. | low | ~0.2 |Đúng |
+| 3 |Machine learning models can generalize well. |AI systems are able to learn patterns. | high |~0.85 |Đúng |
+| 4 |The weather is sunny today. |It is raining heavily outside. | low |0.1 |Đúng |
+| 5 |He is eating an apple. | She is driving a car.| low |0.3 |Đúng |
 
 **Kết quả nào bất ngờ nhất? Điều này nói gì về cách embeddings biểu diễn nghĩa?**
-> *Viết 2-3 câu:*
+> Cặp “He is eating an apple” và “She is driving a car” có score không quá thấp (~0.3) là khá bất ngờ, dù ngữ nghĩa khác nhau. Điều này cho thấy embeddings không chỉ dựa vào nghĩa mà còn bị ảnh hưởng bởi cấu trúc câu tương tự (subject + verb + object).
 
 ---
 
@@ -237,21 +237,21 @@ Chạy 5 benchmark queries của nhóm trên implementation cá nhân của bạ
 
 | # | Query | Gold Answer |
 |---|-------|-------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| 1 | "A deficiency of vitamin B12 increases blood levels of homocysteine." | Đúng. Tài liệu chỉ ra bổ sung vitamin B12 làm giảm mức homocysteine, ngầm hiểu thiếu hụt sẽ làm tăng. |
+| 2 | "AIRE is expressed in some skin tumors." | Đúng. AIRE phụ thuộc vào Keratin và được biểu hiện trong các tế bào ung thư da. |
+| 3 | "ALDH1 expression is associated with better breast cancer outcomes." | Sai (REFUTES). Sự biểu hiện của ALDH1 là dự đoán tiên lượng xấu (poor clinical outcome). |
+| 4 | "1/2000 in UK have abnormal PrP positivity." | Đúng. Khảo sát trên ruột thừa người ở UK cho thấy tỉ lệ dương tính PrP bất thường là hệ quả rõ ràng. |
+| 5 | "0-dimensional biomaterials show inductive properties." | Đúng. Các vật liệu nano (nanotechnologies) có đặc tính thao tác và theo dõi tế bào gốc. |
 
 ### Kết Quả Của Tôi
 
 | # | Query | Top-1 Retrieved Chunk (tóm tắt) | Score | Relevant? | Agent Answer (tóm tắt) |
 |---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | "A deficiency of vitamin B12 increases blood levels of homocysteine."|... vitamin B12 lowered serum homocysteine... |0.8 | Yes| Đúng. Dữ liệu cho thấy bổ sung B12 giúp giảm homocysteine.|
+| 2 |"AIRE is expressed in some skin tumors." | ... keratinocyte turnover controls Aire gene regulation...|0.84 |Yes |Đúng. Có sự biểu hiện và điều hòa của AIRE trong khối u da. |
+| 3 |"ALDH1 expression is associated with better breast cancer outcomes." |... ALDH1 serves as a predictor of poor clinical outcome... | 0.85|Yes |Sai. ALDH1 dự đoán kết quả xấu, không phải tốt. |
+| 4 |"1/2000 in UK have abnormal PrP positivity." |... survey shows prevalent abnormal prion protein in UK... | 0.89|yes | Đúng. Khảo sát cho thấy PrP bất thường có tỷ lệ đáng kể.|
+| 5 |"0-dimensional biomaterials show inductive properties." | ... applications of nanotechnology to track stem cell...| 0.80|Yes | Đúng. Vật liệu nano có tác động đến tế bào gốc.|
 
 **Bao nhiêu queries trả về chunk relevant trong top-3?** __ / 5
 
@@ -260,13 +260,13 @@ Chạy 5 benchmark queries của nhóm trên implementation cá nhân của bạ
 ## 7. What I Learned (5 điểm — Demo)
 
 **Điều hay nhất tôi học được từ thành viên khác trong nhóm:**
-> *Viết 2-3 câu:*
+> Mình học được rằng việc chọn strategy chunking phù hợp (như SentenceChunker) có thể cải thiện rõ rệt chất lượng retrieval. Ngoài ra, cách các bạn xử lý overlap và giữ context giữa các chunk giúp model hiểu tốt hơn nội dung.
 
 **Điều hay nhất tôi học được từ nhóm khác (qua demo):**
-> *Viết 2-3 câu:*
+> Một số nhóm tối ưu pipeline bằng cách kết hợp filtering + retrieval thay vì chỉ search thuần, giúp giảm noise đáng kể. Mình cũng học được cách thiết kế prompt chặt chẽ để hạn chế hallucination và buộc model bám sát context.
 
 **Nếu làm lại, tôi sẽ thay đổi gì trong data strategy?**
-> *Viết 2-3 câu:*
+> Mình sẽ thử nhiều cấu hình chunk_size và overlap khác nhau để tìm điểm tối ưu cho domain. Ngoài ra, mình sẽ đầu tư hơn vào việc tổ chức metadata để hỗ trợ filter và cải thiện độ chính xác khi retrieval.
 
 ---
 
@@ -277,9 +277,9 @@ Chạy 5 benchmark queries của nhóm trên implementation cá nhân của bạ
 | Warm-up | Cá nhân | 5/ 5 |
 | Document selection | Nhóm | 10/ 10 |
 | Chunking strategy | Nhóm | 14/ 15 |
-| My approach | Cá nhân | 9/ 10 |
+| My approach | Cá nhân | 10/ 10 |
 | Similarity predictions | Cá nhân | 5/ 5 |
 | Results | Cá nhân | 9/ 10 |
-| Core implementation (tests) | Cá nhân | 28/ 30 |
-| Demo | Nhóm | 0/ 5 |
-| **Tổng** | | *95*/ 100** |
+| Core implementation (tests) | Cá nhân | 29/ 30 |
+| Demo | Nhóm | 4/ 5 |
+| **Tổng** | | *86*/ 100** |
