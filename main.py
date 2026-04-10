@@ -8,6 +8,7 @@ from typing import Callable
 from dotenv import load_dotenv
 
 from src.agent import KnowledgeBaseAgent
+from src.chunking import SentenceChunker
 from src.embeddings import (
     EMBEDDING_PROVIDER_ENV,
     LOCAL_EMBEDDING_MODEL,
@@ -144,7 +145,20 @@ def run_manual_demo(
         embedding_fn=embedder,
     )
 
-    store.add_documents(docs)
+    # Chunk documents for better retrieval
+    chunker = SentenceChunker(max_sentences_per_chunk=3, overlap=1)
+    chunked_docs: list[Document] = []
+    for doc in docs:
+        chunks = chunker.chunk(doc.content)
+        for chunk_index, chunk_text in enumerate(chunks):
+            chunked_docs.append(
+                Document(
+                    id=f"{doc.id}_chunk{chunk_index}",
+                    content=chunk_text,
+                    metadata={**doc.metadata, "parent_doc": doc.id},
+                )
+            )
+    store.add_documents(chunked_docs)
 
     print(f"Stored {store.get_collection_size()} documents")
 
